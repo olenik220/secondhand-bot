@@ -255,8 +255,21 @@ def delete_item(item_id):
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     debug = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+
+    # Определяем IP для показа ссылки
+    local_ip = '127.0.0.1'
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+
     print(f"🌐 Веб-приложение для учёта секонд-хенда")
-    print(f"   Открой в браузере: http://127.0.0.1:{port}")
+    print(f"   На этом ПК:  http://127.0.0.1:{port}")
+    print(f"   С телефона:  http://{local_ip}:{port}")
     print(f"   Пароль: {'установлен' if WEB_PASSWORD else 'не требуется'}")
     print(f"   Google Sheets: {'✅' if sheets_sync.is_available else '❌ не подключена'}")
     print(f"   AI: {config.ai_label}")
