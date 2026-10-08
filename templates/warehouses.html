@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vova40 — Выбор склада</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+               background: #f5f5f5; color: #333; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .content { max-width: 400px; width: 100%; padding: 20px; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header .logo { display: inline-flex; align-items: center; justify-content: center;
+                       background: linear-gradient(135deg, #4A90D9, #357ABD);
+                       color: white; border-radius: 12px; padding: 6px 14px;
+                       font-size: 28px; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px; }
+        .header h1 { font-size: 18px; color: #888; font-weight: 600; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .wh-card { background: white; border-radius: 16px; padding: 20px; text-align: center;
+                   box-shadow: 0 2px 8px rgba(0,0,0,.04); cursor: pointer; text-decoration: none; color: inherit; }
+        .wh-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+        .wh-card .icon { font-size: 40px; margin-bottom: 8px; }
+        .wh-card .name { font-size: 16px; font-weight: 600; }
+        .logout { position: fixed; top: 16px; right: 16px; font-size: 13px; color: #d00; text-decoration: none;
+                  background: white; padding: 6px 12px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('logout') }}" class="logout">Выйти</a>
+    <div class="content">
+        <div class="header">
+            <div class="logo">40</div>
+            <h1>Выбери склад</h1>
+        </div>
+        <div class="grid">
+            {% for wh in warehouses %}
+                <a class="wh-card" href="{{ url_for('warehouse_items', wh_id=wh.id) }}">
+                    <div class="icon">{{ wh.icon }}</div>
+                    <div class="name">{{ wh.name }}</div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

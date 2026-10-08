@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Vova40 — Категория</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#333}
+.header{background:white;padding:16px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #eee}
+.header a{text-decoration:none;font-size:22px;color:#333}.header h1{font-size:18px;font-weight:700}
+.content{max-width:500px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat{background:white;border-radius:14px;padding:18px 12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);text-decoration:none;color:inherit}
+.cat .icon{font-size:32px;margin-bottom:6px}.cat .name{font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="header"><a href="{{ url_for('warehouse_items', wh_id=wh_id) }}">←</a><h1>Выбери категорию</h1></div>
+<div class="content"><div class="grid">{% for cat in categories %}<a class="cat" href="{{ url_for('add_item', wh_id=wh_id, category=cat) }}"><div class="icon">👕</div><div class="name">{{ cat }}</div></a>{% endfor %}</div></div>
+</body>
+</html>
