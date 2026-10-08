@@ -267,7 +267,7 @@ if __name__ == '__main__':
     except Exception:
         pass
 
-    print(f"🌐 Веб-приложение для учёта секонд-хенда")
+    print(f"40 Vova40 — учёт секонд-хенда")
     print(f"   На этом ПК:  http://127.0.0.1:{port}")
     print(f"   С телефона:  http://{local_ip}:{port}")
     print(f"   Пароль: {'установлен' if WEB_PASSWORD else 'не требуется'}")
