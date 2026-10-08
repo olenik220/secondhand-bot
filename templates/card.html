@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Товар #{{ item.id }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+               background: #f5f5f5; color: #333; padding-bottom: 20px; }
+        .header { background: white; padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+                  border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10; }
+        .header a { text-decoration: none; font-size: 22px; color: #333; }
+        .header h1 { font-size: 18px; font-weight: 700; flex: 1; }
+        .content { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .photo-card { background: white; border-radius: 16px; overflow: hidden; margin-bottom: 12px; }
+        .photo-card img { width: 100%; display: block; }
+        .photo-card .no-photo { padding: 40px; text-align: center; color: #aaa; font-size: 40px; }
+        .info-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 12px;
+                     box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .info-card h2 { font-size: 20px; margin-bottom: 12px; }
+        .info-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;
+                    border-bottom: 1px solid #f5f5f5; }
+        .info-row:last-child { border: none; }
+        .info-row .label { color: #888; }
+        .info-row .value { font-weight: 600; text-align: right; }
+        .stage-bar { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
+        .stage-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center;
+                     justify-content: center; font-size: 12px; font-weight: 700; }
+        .stage-dot.done { background: #4A90D9; color: white; }
+        .stage-dot.current { background: #4A90D9; color: white; box-shadow: 0 0 0 3px rgba(74,144,217,.3); }
+        .stage-dot.future { background: #e0e0e0; color: #999; }
+        .stage-labels { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 16px; }
+        .stage-labels span { font-size: 11px; color: #888; padding: 2px 6px; border-radius: 6px; background: #f5f5f5; }
+        .stage-labels span.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .desc-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 12px;
+                     box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .desc-card h3 { font-size: 14px; color: #888; margin-bottom: 8px; }
+        .desc-card pre { white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.5; }
+        .actions-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 12px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .actions-card h3 { font-size: 14px; color: #888; margin-bottom: 12px; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .btn { padding: 10px 16px; font-size: 14px; font-weight: 600; border: none; border-radius: 10px;
+               cursor: pointer; text-decoration: none; flex: 1; min-width: 80px; text-align: center; }
+        .btn-stock { background: #e8f5e9; color: #2e7d32; }
+        .btn-avito { background: #e3f2fd; color: #1565c0; }
+        .btn-sold { background: #fce4ec; color: #c62828; }
+        .btn-writeoff { background: #f5f5f5; color: #999; }
+        .btn-primary { background: #4A90D9; color: white; }
+        .btn-sm { font-size: 13px; padding: 8px 12px; }
+        select { padding: 10px 14px; font-size: 14px; border: 2px solid #ddd; border-radius: 10px;
+                 outline: none; width: 100%; margin-bottom: 8px; background: white; }
+        input[type="text"] { width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #ddd;
+                             border-radius: 10px; outline: none; }
+        textarea { width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #ddd; border-radius: 10px;
+                   outline: none; min-height: 80px; font-family: inherit; }
+        form { margin-bottom: 8px; }
+        .label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px; display: block; }
+        .flash { padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+        .flash.success { background: #e8f5e9; color: #2e7d32; }
+        .flash.danger { background: #ffe0e0; color: #d00; }
+        .flash.warning { background: #fff8e1; color: #f57f17; }
+        .profit-positive { color: #2e7d32; }
+        .profit-negative { color: #c62828; }
+        .avito-link { word-break: break-all; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('index') }}">←</a>
+        <h1>Товар #{{ item.id }}</h1>
+    </div>
+
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                    <div class="flash {{ cat }}">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if item.photo_file_id and item.photo_file_id.startswith('/') %}
+        <div class="photo-card">
+            <img src="{{ item.photo_file_id }}" alt="Фото товара">
+        </div>
+        {% else %}
+        <div class="photo-card">
+            <div class="no-photo">📸</div>
+        </div>
+        {% endif %}
+
+        <div class="info-card">
+            <h2>{{ item.brand or '?' }} — {{ item.category or '?' }}</h2>
+            <div class="info-row"><span class="label">Размер</span><span class="value">{{ item.size or '?' }}</span></div>
+            <div class="info-row"><span class="label">Состояние</span><span class="value">{{ item.condition or '?' }}</span></div>
+            <div class="info-row"><span class="label">Статус</span><span class="value"><strong>{{ item.status or '?' }}</strong></span></div>
+            <div class="info-row">
+                <span class="label">Этап</span>
+                <span class="value">{{ item.stage or '🛍️ Закупка' }}</span>
+            </div>
+
+            {% set s = item.stage or '🛍️ Закупка' %}
+            {% set idx = [] %}
+            {% for x in stages %}
+                {% if x == s %}{% set _ = idx.append(loop.index0) %}{% endif %}
+            {% endfor %}
+            {% set current_idx = idx[0] if idx else -1 %}
+            <div class="stage-bar">
+                {% for i in range(stages|length) %}
+                    <div class="stage-dot {{ 'done' if i < current_idx else 'current' if i == current_idx else 'future' }}">
+                        {{ i + 1 }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="stage-labels">
+                {% for stg in stages %}
+                    <span class="{{ 'active' if loop.index0 == current_idx else '' }}">{{ stg[:20] }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="info-row">
+                <span class="label">Закупка</span>
+                <span class="value">{{ item.purchase_price|int }} ₽</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Продажа</span>
+                <span class="value">{{ item.sale_price|int }} ₽</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Прибыль</span>
+                <span class="value {{ 'profit-positive' if (item.sale_price|int - item.purchase_price|int) >= 0 else 'profit-negative' }}">
+                    {{ item.sale_price|int - item.purchase_price|int }} ₽
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">Добавлен</span>
+                <span class="value">{{ item.created_at or '?' }}</span>
+            </div>
+            {% if item.avito_link %}
+            <div class="info-row">
+                <span class="label">Avito</span>
+                <span class="value avito-link"><a href="{{ item.avito_link }}" target="_blank">{{ item.avito_link[:40] }}...</a></span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Описание -->
+        <div class="desc-card">
+            <h3>📝 Описание для Avito</h3>
+            <form method="POST" action="{{ url_for('ai_generate', item_id=item.id) }}">
+                <button class="btn btn-primary btn-sm" style="margin-bottom:8px;width:auto;">🤖 Сгенерировать AI</button>
+            </form>
+            <form method="POST" action="{{ url_for('update_description', item_id=item.id) }}">
+                <textarea name="description">{{ item.description or '' }}</textarea>
+                <button class="btn btn-primary btn-sm" style="width:auto;margin-top:6px;">💾 Сохранить описание</button>
+            </form>
+        </div>
+
+        <!-- Действия -->
+        <div class="actions-card">
+            <h3>📋 Статус</h3>
+            <div class="btn-group">
+                <form method="POST" action="{{ url_for('update_status', item_id=item.id) }}" style="flex:1;">
+                    <input type="hidden" name="status" value="В наличии">
+                    <button class="btn btn-stock">✅ В наличии</button>
+                </form>
+                <form method="POST" action="{{ url_for('update_status', item_id=item.id) }}" style="flex:1;">
+                    <input type="hidden" name="status" value="На Avito">
+                    <button class="btn btn-avito">📢 На Avito</button>
+                </form>
+                <form method="POST" action="{{ url_for('update_status', item_id=item.id) }}" style="flex:1;">
+                    <input type="hidden" name="status" value="Продано">
+                    <button class="btn btn-sold">💸 Продано</button>
+                </form>
+            </div>
+
+            <h3>🔄 Этап</h3>
+            <form method="POST" action="{{ url_for('update_stage', item_id=item.id) }}">
+                <select name="stage">
+                    {% for st in stages %}
+                        <option value="{{ st }}" {{ 'selected' if st == (item.stage or '🛍️ Закупка') }}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary btn-sm" style="width:auto;">Применить</button>
+            </form>
+        </div>
+
+        <!-- Avito ссылка -->
+        <div class="actions-card">
+            <h3>🔗 Ссылка Avito</h3>
+            <form method="POST" action="{{ url_for('update_avito', item_id=item.id) }}">
+                <input type="text" name="avito_link" placeholder="https://avito.ru/..." value="{{ item.avito_link or '' }}">
+                <button class="btn btn-primary btn-sm" style="width:auto;margin-top:6px;">💾 Сохранить</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="margin-top:12px;"
+                  onsubmit="return confirm('Списать товар?')">
+                <button class="btn btn-writeoff" style="background:#fce4ec;color:#c62828;">🗑️ Списать товар</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
