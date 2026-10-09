@@ -72,7 +72,7 @@
 </head>
 <body>
     <div class="header">
-        <a href="{{ url_for('index') }}">←</a>
+        <a href="{{ url_for('warehouse_items', wh_id=item.warehouse or 'base') }}">←</a>
         <h1><span class="logo">40</span> Vova40</h1>
         <span style="font-size:14px;color:#888;">Товар #{{ item.id }}</span>
     </div>
